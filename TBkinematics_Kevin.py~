@@ -1,0 +1,928 @@
+#! /usr/bin/env python
+
+###################################################################
+##								 ##
+## Name: TBkinematics.py	   			                 ##
+## Author: Kevin Nash 						 ##
+## Date: 6/5/2012						 ##
+## Purpose: This program makes histograms of different 		 ##
+##	    variables.			  	 		 ##
+##          TBrate_Maker.py stored in fitdata, and uses 	 ##
+##          them to weigh pre b tagged samples to create a 	 ##
+##	    QCD background estimate along with the full event    ##
+##	    selection to product Mtb inputs to Theta		 ##
+##								 ##
+###################################################################
+
+import os
+import glob
+import math
+from math import sqrt
+#import quickroot
+#from quickroot import *
+import ROOT 
+from ROOT import *
+import sys
+from DataFormats.FWLite import Events, Handle
+from optparse import OptionParser
+
+parser = OptionParser()
+
+parser.add_option('-s', '--set', metavar='F', type='string', action='store',
+                  default	=	'data',
+                  dest		=	'set',
+                  help		=	'data or ttbar')
+parser.add_option('-x', '--pileup', metavar='F', type='string', action='store',
+                  default	=	'on',
+                  dest		=	'pileup',
+                  help		=	'If not data do pileup reweighting?')
+parser.add_option('-n', '--num', metavar='F', type='string', action='store',
+                  default	=	'all',
+                  dest		=	'num',
+                  help		=	'job number')
+parser.add_option('-j', '--jobs', metavar='F', type='string', action='store',
+                  default	=	'1',
+                  dest		=	'jobs',
+                  help		=	'number of jobs')
+
+# /*changed this next part - JL
+parser.add_option('-t', '--tname', metavar='F', type='string', action='store',
+                  default	=	'HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p41_v1,HLT_PFHT900_v1',
+                  dest		=	'tname',
+                  help		=	'trigger name')
+# change */
+
+#parser.add_option('-t', '--trigger', metavar='F', type='string', action='store',
+#                  default	=	'none',
+#                  dest		=	'trigger',
+#                  help		=	'none, nominal, up, or down')
+
+
+parser.add_option('-m', '--modulesuffix', metavar='F', type='string', action='store',
+                  default	=	'none',
+                  dest		=	'modulesuffix',
+                  help		=	'ex. PtSmearUp')
+
+parser.add_option('-g', '--grid', metavar='F', type='string', action='store',
+                  default	=	'off',
+                  dest		=	'grid',
+                  help		=	'running on grid off or on')
+parser.add_option('-u', '--ptreweight', metavar='F', type='string', action='store',
+                  default	=	'none',
+                  dest		=	'ptreweight',
+                  help		=	'on or off')
+
+parser.add_option('-p', '--pdfweights', metavar='F', type='string', action='store',
+                  default	=	'nominal',
+                  dest		=	'pdfweights',
+                  help		=	'nominal, up, or down')
+parser.add_option('-z', '--pdfset', metavar='F', type='string', action='store',
+                  default	=	'cteq66',
+                  dest		=	'pdfset',
+                  help		=	'pdf set')
+parser.add_option('--printEvents', metavar='F', action='store_true',
+                  default=False,
+                  dest='printEvents',
+                  help='Print events that pass selection (run:lumi:event)')
+parser.add_option('-c', '--cuts', metavar='F', type='string', action='store',
+                  default	=	'default',
+                  dest		=	'cuts',
+                  help		=	'Cuts type (ie default, rate, etc)')
+
+parser.add_option('-b', '--bx', metavar='F', type='string', action='store',
+                  default	=	'25ns',
+                  dest		=	'bx',
+                  help		=	'bunch crossing 50ns or 25ns')
+
+
+(options, args) = parser.parse_args()
+
+tname = options.tname.split(',')
+tnamestr = ''
+for iname in range(0,len(tname)):
+	tnamestr+=tname[iname]
+	if iname!=len(tname)-1:
+		tnamestr+='OR'
+
+print "Options summary"
+print "=================="
+for  opt,value in options.__dict__.items():
+	#print str(option)+ ": " + str(options[option]) 
+	print str(opt) +': '+ str(value)
+print "=================="
+print ""
+di = ""
+if options.grid == 'on':
+	di = "tardir/"
+	sys.path.insert(0, 'tardir/')
+
+
+
+import Wprime_Functions	
+from Wprime_Functions import *
+
+#Load up cut values based on what selection we want to run 
+Cuts = LoadCuts(options.cuts)
+bpt = Cuts['bpt']
+tpt = Cuts['tpt']
+dy = Cuts['dy']
+tmass = Cuts['tmass']
+nsubjets = Cuts['nsubjets']
+tau32 = Cuts['tau32']
+minmass = Cuts['minmass']
+sjbtag = Cuts['sjbtag']
+bmass = Cuts['bmass']
+btag = Cuts['btag']
+eta1 = Cuts['eta1']
+eta2 = Cuts['eta2']
+eta3 = Cuts['eta3']
+
+
+print bpt[0]
+
+#For large datasets we need to parallelize the processing
+jobs=int(options.jobs)
+if jobs != 1:
+	num=int(options.num)
+	jobs=int(options.jobs)
+	print "Running over " +str(jobs)+ " jobs"
+	print "This will process job " +str(num)
+else:
+	print "Running over all events"
+
+#This section defines some strings that are used in naming the optput files
+mod = "ttbsmAna"
+if options.modulesuffix != "none" :
+	mod = mod + options.modulesuffix
+
+pstr = ""
+if options.pdfweights!="nominal":
+	print "using pdf uncertainty"
+	pstr = "_pdf_"+options.pdfset+"_"+options.pdfweights
+
+pustr = ""
+if options.pileup=='off':
+	pustr = "_pileup_unweighted"
+
+
+run_b_SF = True
+
+#Based on what set we want to analyze, we find all Ntuple root files 
+
+files = Load_Ntuples(options.set, options.bx) 
+
+if (options.set.find('ttbar') != -1) or (options.set.find('singletop') != -1):
+	settype = 'ttbar'
+elif (options.set.find('QCD') != -1):
+	settype ='QCD'
+	run_b_SF = False
+else :
+	
+	settype = options.set.replace('right','').replace('left','').replace('mixed','')
+
+print 'The type of set is ' + settype
+
+if options.set != 'data':
+	#Load up scale factors (to be used for MC only)
+
+	TrigFile = TFile(di+"Triggerweight_signalright2000.root")	#"TRIG_EFFICWPHTdata_dijet13TeV.root") #changed 8TeV to 13TeV -JL
+	TrigPlot = TrigFile.Get("TriggerWeight_"+tnamestr)
+
+	#UNCOMMENT LATER
+	#PileFile = TFile(di+"PileUp_Ratio_"+settype+".root")
+	#PilePlot = PileFile.Get("Pileup_Ratio")
+
+# We select all the events:    
+events = Events (files)
+
+#Here we load up handles and labels.
+#These are used to grab entries from the Ntuples.
+#To see all the current types in an Ntuple use edmDumpEventContent /PathtoNtuple/Ntuple.root
+
+AK8HL =Initlv("jetsAK8") #added this -JL
+
+
+pdfHandle 	= 	Handle("std::vector<float>") #changed double to float -JL
+pdfLabel 	= 	( "pdfWeights",options.pdfset)
+
+puHandle    	= 	Handle("int")
+puLabel     	= 	( "eventUserData", "puNtrueInt" )
+
+npvHandle    	= 	Handle("unsigned int")
+npvLabel     	= 	( "eventUserData", "npv" )
+
+
+#added these in the style of the 13TeV TBrate.py file -JL
+BDiscHandle 	= 	Handle (  "vector<float> "  )
+BDiscLabel  	= 	( "jetsAK8" , "jetAK8CSV")
+
+topMassHandle 	= 	Handle (  "vector<float> "  )
+topMassLabel  	= 	( "jetsAK8" , "jetAK8softDropMass")
+
+nSubjetsHandle 	= 	Handle (  "vector<float> "  )
+nSubjetsLabel  	= 	( "jetsAK8" , "jetAK8nSubJets")
+
+minmassHandle 	= 	Handle (  "vector<float> "  )
+minmassLabel  	= 	( "jetsAK8" , "jetAK8minmass")
+
+topBDiscCSV0Handle 	= 	Handle (  "vector<float> "  )
+topBDiscCSV0Label  	= 	( "jetsAK8" , "jetAK8CSV")
+
+topBDiscCSV1Handle 	= 	Handle (  "vector<float> "  )
+topBDiscCSV1Label  	= 	( "jetsAK8" , "jetAK8CSV")
+
+topBDiscCSV2Handle 	= 	Handle (  "vector<float> "  )
+topBDiscCSV2Label  	= 	( "jetsAK8" , "jetAK8CSV")
+
+topBDiscCSV3Handle 	= 	Handle (  "vector<float> "  )
+topBDiscCSV3Label  	= 	( "jetsAK8" , "jetAK8CSV")
+
+tau2Handle 	= 	Handle (  "vector<float> "  )
+tau2Label  	= 	( "jetsAK8" , "jetAK8tau2")
+
+tau3Handle 	= 	Handle (  "vector<float> "  )
+tau3Label  	= 	( "jetsAK8" , "jetAK8tau3")
+
+subjetsCSVHandle 	= 	Handle (  "vector<float> "  )
+subjetsCSVLabel  	= 	( "subjetsCmsTopTag" , "subjetCmsTopTagCSV")
+
+subjets0indexHandle 	= 	Handle (  "vector<float> "  )
+subjets0indexLabel  	= 	( "jetsAK8" , "jetAK8topSubjetIndex0")
+
+subjets1indexHandle 	= 	Handle (  "vector<float> "  )
+subjets1indexLabel  	= 	( "jetsAK8" , "jetAK8topSubjetIndex1")
+
+subjets2indexHandle 	= 	Handle (  "vector<float> "  )
+subjets2indexLabel  	= 	( "jetsAK8" , "jetAK8topSubjetIndex2")
+
+subjets3indexHandle 	= 	Handle (  "vector<float> "  )
+subjets3indexLabel  	= 	( "jetsAK8" , "jetAK8topSubjetIndex3")
+
+
+GenHandle = Handle( "vector<reco::GenParticle>" )
+GenLabel = ( "prunedGenParticles", "" )
+
+#---------------------------------------------------------------------------------------------------------------------#
+
+if jobs != 1:
+	f = TFile( "TBkinematics"+options.set+"_Trigger_"+options.tname+"_"+options.modulesuffix +pustr+pstr+"_job"+options.num+"of"+options.jobs+"_PSET_"+options.cuts+".root", "recreate" )
+else:
+	f = TFile( "TBkinematics"+options.set+"_Trigger_"+options.tname+"_"+options.modulesuffix +pustr+pstr+"_PSET_"+options.cuts+".root", "recreate" )
+
+#Load up the average b-tagging rates -- Takes parameters from text file and makes a function
+
+#UNCOMMENT LATER
+#BTR = BTR_Init('Bifpoly','rate_'+options.cuts,di)
+#BTR_err = BTR_Init('Bifpoly_err','rate_'+options.cuts,di)
+fittitles = ["pol0","pol2","pol3","FIT","Bifpoly","expofit"]
+fits = []
+#for fittitle in fittitles:
+#	fits.append(BTR_Init(fittitle,'rate_'+options.cuts,di))
+
+print "Creating histograms"
+
+#Define Histograms
+
+TagFile1 = TFile(di+"Tagrate2D.root")
+TagPlot2de1= TagFile1.Get("tagrateeta1")
+TagPlot2de2= TagFile1.Get("tagrateeta2")
+TagPlot2de3= TagFile1.Get("tagrateeta3")
+
+f.cd()
+#---------------------------------------------------------------------------------------------------------------------#
+
+Mtb0	    = TH1F("Mtb0",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb1	    = TH1F("Mtb1",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb2	    = TH1F("Mtb2",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb3	    = TH1F("Mtb3",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb4	    = TH1F("Mtb4",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb5	    = TH1F("Mtb5",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb6	    = TH1F("Mtb6",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb7	    = TH1F("Mtb7",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb8	    = TH1F("Mtb8",     	  "mass of tb",     	  	         140, 500, 4000 )
+Mtb9	    = TH1F("Mtb9",    	  "mass of tb",     	  	         140, 500, 4000 )
+#Mtbptup    = TH1F("Mtbptup",     "mass of tb ttbar pt reweighting up",  140, 500, 4000 )
+#Mtbptdown  = TH1F("Mtbptdown",   "mass of tb ttbar pt reweighting up",  140, 500, 4000 )
+
+#MtbBup	    = TH1F("MtbBup",      "mass of tb B tag SF up",     	 140, 500, 4000 )
+#MtbBDown   = TH1F("MtbBDown",    "mass of tb B tag SF up",     	 140, 500, 4000 )
+
+#--------Other parameters (@JL)-------#
+HG_tmass       = TH1F("tmass",     "top mass in b+1",                 150, 0, 500 )
+
+HG_minmass     = TH1F("minmass",   "minmass in b+1",                   60, 0, 120 )
+HG_nsubjets    = TH1F("nsubjets",  "nsubjets in b+1",                   7, -0.5, 6.5 )
+HG_njets	    = TH1F("njets",     "nsubjets in b+1",                   7, -0.5, 6.5 )
+
+HG_teta        	= TH1F("teta",      "top eta in b+1",                   24, -2.4, 2.4 )
+HG_beta        	= TH1F("beta",      "b eta in b+1",                     24, -2.4, 2.4 )
+HG_tpt         	= TH1F("tpt",       "top pt in b+1",                   150, 0, 1500 )
+HG_bpt         	= TH1F("bpt",       "b pt in b+1",                     150, 0, 1500 )
+HG_sumpt       	= TH1F("sumpt",     "dijet lorentz sum pt in b+1",     150, 0, 1500 )
+HG_tphi        	= TH1F("tphi",      "t phi in b+1",                     24, -3.14, 3.14 )
+HG_bphi        	= TH1F("bphi",      "b phi in b+1",                     24, -3.14, 3.14 )
+HG_dphi 	= TH1F("dphi",      "delta phi in b+1",                	24, -6.28, 6.28 )
+
+HG_drap        = TH1F("drap",      "delta rapidity in b+1",            24, 0, 5 )
+
+HG_TopBDiscsjmaxCSV = TH1F("TopBDiscsjmaxCSV",  "top mass in b+1",    100, 0, 1.5 )
+
+HG_tau32       = TH1F("tau32",     "top mass in b+1",                 100, 0., 1.5 )
+HG_bmass	    = TH1F("bmass",     "b mass in b+1",                   150, 0, 300 )
+
+#-------------QCD bkg error for each parameter---------#
+
+QCDbkg 	    	= TH1F("QCDbkg",     "QCD background estimate",     	 140, 500, 4000 )
+QCDbkgh	    	= TH1F("QCDbkgh",    "QCD background estimate up error",     140, 500, 4000 )
+QCDbkgl     	= TH1F("QCDbkgl",    "QCD background estimate down error",   140, 500, 4000 )
+QCDbkg2D    	= TH1F("QCDbkg2D",   "QCD background estimate 2d error",     140, 500, 4000 )
+
+QCDbkg_tmass 	= TH1F("QCDbkg_tmass",   "QCD bkg estimate for top mass in b+1",   	  	150, 0, 500 )
+QCDbkgh_tmass 	= TH1F("QCDbkgh_tmass",  "QCD bkg estimate up error for top mass in b+1", 	150, 0, 500 )
+QCDbkgl_tmass 	= TH1F("QCDbkgl_tmass",  "QCD bkg estimate down error for top mass in b+1",	150, 0, 500 )
+QCDbkg2D_tmass 	= TH1F("QCDbkg2D_tmass", "QCD bkg estimate for top mass in b+1",   		150, 0, 500 )
+
+QCDbkg_teta 	= TH1F("QCDbkg_teta",   "QCD bkg estimate for top eta in b+1",   	  	24, -2.4, 2.4 )
+QCDbkgh_teta 	= TH1F("QCDbkgh_teta",  "QCD bkg estimate up error for top eta in b+1", 	24, -2.4, 2.4 )
+QCDbkgl_teta 	= TH1F("QCDbkgl_teta",  "QCD bkg estimate down error for top eta in b+1",	24, -2.4, 2.4 )
+QCDbkg2D_teta 	= TH1F("QCDbkg2D_teta", "QCD bkg estimate for top eta in b+1",   		24, -2.4, 2.4 )
+
+QCDbkg_beta 	= TH1F("QCDbkg_beta",   "QCD bkg estimate for b eta in b+1",   	  	24, -2.4, 2.4 )
+QCDbkgh_beta 	= TH1F("QCDbkgh_beta",  "QCD bkg estimate up error for b eta in b+1", 	24, -2.4, 2.4 )
+QCDbkgl_beta 	= TH1F("QCDbkgl_beta",  "QCD bkg estimate down error for b eta in b+1",	24, -2.4, 2.4 )
+QCDbkg2D_beta 	= TH1F("QCDbkg2D_beta", "QCD bkg estimate for b eta in b+1",   		24, -2.4, 2.4 )
+
+QCDbkg_tpt 	= TH1F("QCDbkg_tpt",   "QCD bkg estimate for top pt in b+1",   	  	150, 0, 1500 )
+QCDbkgh_tpt 	= TH1F("QCDbkgh_tpt",  "QCD bkg estimate up error for top pt in b+1", 	150, 0, 1500 )
+QCDbkgl_tpt 	= TH1F("QCDbkgl_tpt",  "QCD bkg estimate down error for top pt in b+1",	150, 0, 1500 )
+QCDbkg2D_tpt 	= TH1F("QCDbkg2D_tpt", "QCD bkg estimate for top pt in b+1",   		150, 0, 1500 )
+
+QCDbkg_bpt 	= TH1F("QCDbkg_bpt",   "QCD bkg estimate for b pt in b+1",   	  	150, 0, 1500 )
+QCDbkgh_bpt 	= TH1F("QCDbkgh_bpt",  "QCD bkg estimate up error for b pt in b+1", 	150, 0, 1500 )
+QCDbkgl_bpt 	= TH1F("QCDbkgl_bpt",  "QCD bkg estimate down error for b pt in b+1",	150, 0, 1500 )
+QCDbkg2D_bpt 	= TH1F("QCDbkg2D_bpt", "QCD bkg estimate for b pt in b+1",   		150, 0, 1500 )
+
+QCDbkg_sumpt 	= TH1F("QCDbkg_sumpt",   "QCD bkg estimate for sum pt in b+1",   	  	150, 0, 1500 )
+QCDbkgh_sumpt 	= TH1F("QCDbkgh_sumpt",  "QCD bkg estimate up error for sum pt in b+1", 	150, 0, 1500 )
+QCDbkgl_sumpt 	= TH1F("QCDbkgl_sumpt",  "QCD bkg estimate down error for sum pt in b+1",	150, 0, 1500 )
+QCDbkg2D_sumpt 	= TH1F("QCDbkg2D_sumpt", "QCD bkg estimate for sum pt in b+1",   		150, 0, 1500 )
+
+QCDbkg_tphi 	= TH1F("QCDbkg_tphi",   "QCD bkg estimate for t phi in b+1",   	  	24, -3.14, 3.14 )
+QCDbkgh_tphi 	= TH1F("QCDbkgh_tphi",  "QCD bkg estimate up error for t phi in b+1", 	24, -3.14, 3.14 )
+QCDbkgl_tphi 	= TH1F("QCDbkgl_tphi",  "QCD bkg estimate down error for t phi in b+1",	24, -3.14, 3.14 )
+QCDbkg2D_tphi 	= TH1F("QCDbkg2D_tphi", "QCD bkg estimate for t phi in b+1",   		24, -3.14, 3.14 )
+
+QCDbkg_bphi 	= TH1F("QCDbkg_bphi",   "QCD bkg estimate for b phi in b+1",   	  	24, -3.14, 3.14 )
+QCDbkgh_bphi 	= TH1F("QCDbkgh_bphi",  "QCD bkg estimate up error for b phi in b+1", 	24, -3.14, 3.14 )
+QCDbkgl_bphi 	= TH1F("QCDbkgl_bphi",  "QCD bkg estimate down error for b phi in b+1",	24, -3.14, 3.14 )
+QCDbkg2D_bphi 	= TH1F("QCDbkg2D_bphi", "QCD bkg estimate for b phi in b+1",   		24, -3.14, 3.14 )
+
+QCDbkg_dphi 	= TH1F("QCDbkg_dphi",   "QCD bkg estimate for d phi in b+1",   	  	150, -6.28, 6.28 )
+QCDbkgh_dphi 	= TH1F("QCDbkgh_dphi",  "QCD bkg estimate up error for d phi in b+1", 	150, -6.28, 6.28 )
+QCDbkgl_dphi 	= TH1F("QCDbkgl_dphi",  "QCD bkg estimate down error for d phi in b+1",	150, -6.28, 6.28 )
+QCDbkg2D_dphi 	= TH1F("QCDbkg2D_dphi", "QCD bkg estimate for d phi in b+1",   		150, -6.28, 6.28 )
+
+Mtb0.Sumw2()
+Mtb1.Sumw2()
+Mtb2.Sumw2()
+Mtb3.Sumw2()
+Mtb4.Sumw2()
+Mtb5.Sumw2()
+Mtb6.Sumw2()
+Mtb7.Sumw2()
+Mtb8.Sumw2()
+Mtb9.Sumw2()
+#Mtbptup.Sumw2()
+#Mtbptdown.Sumw2()
+#MtbBup.Sumw2()
+#MtbBDown.Sumw2()
+
+HG_tmass.Sumw2()
+HG_minmass.Sumw2()
+HG_nsubjets.Sumw2()
+HG_njets.Sumw2()
+HG_teta.Sumw2()
+HG_beta.Sumw2()
+HG_tpt.Sumw2()
+HG_bpt.Sumw2()
+HG_sumpt.Sumw2()
+HG_tphi.Sumw2()
+HG_bphi.Sumw2()
+HG_drap.Sumw2()
+HG_dphi.Sumw2()
+HG_TopBDiscsjmaxCSV.Sumw2()
+HG_tau32.Sumw2()
+HG_bmass.Sumw2()
+
+QCDbkg.Sumw2()
+QCDbkg_tmass.Sumw2()
+QCDbkg_teta.Sumw2()
+QCDbkg_beta.Sumw2()
+QCDbkg_tpt.Sumw2()
+QCDbkg_bpt.Sumw2()
+QCDbkg_sumpt.Sumw2()
+QCDbkg_tphi.Sumw2()
+QCDbkg_bphi.Sumw2()
+QCDbkg_dphi.Sumw2()
+
+QCDbkg_ARR 	 = []
+QCDbkg_tmass_ARR = []
+QCDbkg_teta_ARR  = []
+QCDbkg_beta_ARR  = []
+QCDbkg_tpt_ARR   = []
+QCDbkg_bpt_ARR   = []
+QCDbkg_sumpt_ARR = []
+QCDbkg_tphi_ARR  = []
+QCDbkg_bphi_ARR  = []
+QCDbkg_dphi_ARR  = []
+
+
+for ihist in range(0,len(fittitles)):
+	QCDbkg_ARR.append(TH1F("QCDbkg"+str(fittitles[ihist]),     "mass W' in b+1 pt est etabin",     	  	      140, 500, 4000 ))
+	QCDbkg_tmass_ARR.append(TH1F("QCDbkg_tmass"+str(fittitles[ihist]),     "top mass in b+1",                	 150, 0, 500 ))
+	QCDbkg_teta_ARR.append(TH1F("QCDbkg_teta"+str(fittitles[ihist]),     "top eta in b+1",				24, -2.4, 2.4 ))
+	QCDbkg_beta_ARR.append(TH1F("QCDbkg_beta"+str(fittitles[ihist]),     "b eta in b+1",				24, -2.4, 2.4 ))
+	QCDbkg_tpt_ARR.append(TH1F("QCDbkg_tpt"+str(fittitles[ihist]),     	"top pt in b+1",			150, 0, 1500 ))
+	QCDbkg_bpt_ARR.append(TH1F("QCDbkg_bpt"+str(fittitles[ihist]),     	"b pt in b+1",       			150, 0, 1500 ))
+	QCDbkg_sumpt_ARR.append(TH1F("QCDbkg_sumpt"+str(fittitles[ihist]),    "dijet lorentz sum pt in b+1",       	150, 0, 1500 ))
+	QCDbkg_tphi_ARR.append(TH1F("QCDbkg_tphi"+str(fittitles[ihist]),     "t phi in b+1",				24, -3.14, 3.14 ))
+	QCDbkg_bphi_ARR.append(TH1F("QCDbkg_bphi"+str(fittitles[ihist]),     "b phi in b+1",				24, -3.14, 3.14 ))
+	QCDbkg_dphi_ARR.append(TH1F("QCDbkg_dphi"+str(fittitles[ihist]),     "delta eta in b+1",			150, -6.28, 6.28 ))
+	
+	QCDbkg_ARR[ihist].Sumw2()
+	QCDbkg_tmass_ARR[ihist].Sumw2()
+	QCDbkg_teta_ARR[ihist].Sumw2()
+	QCDbkg_beta_ARR[ihist].Sumw2()
+	QCDbkg_tpt_ARR[ihist].Sumw2()
+	QCDbkg_bpt_ARR[ihist].Sumw2()
+	QCDbkg_sumpt_ARR[ihist].Sumw2()
+	QCDbkg_tphi_ARR[ihist].Sumw2()
+	QCDbkg_bphi_ARR[ihist].Sumw2()
+	QCDbkg_dphi_ARR[ihist].Sumw2()	
+	
+
+
+#---------------------------------------------------------------------------------------------------------------------#
+
+# loop over events
+#---------------------------------------------------------------------------------------------------------------------#
+
+count = 0
+jobiter = 0
+print "Start looping"
+#initialize the ttree variables
+tree_vars = {"bpt":array('d',[0.]),"bmass":array('d',[0.]),"btag":array('d',[0.]),"tpt":array('d',[0.]),"tmass":array('d',[0.]),"nsubjets":array('d',[0.]),"sjbtag":array('d',[0.])}
+Tree = Make_Trees(tree_vars)
+
+goodEvents = []
+totevents = events.size()
+print str(totevents)  +  ' Events total'
+for event in events:
+    weightSFb = 1.0
+    errorSFb = 0.0
+    count	= 	count + 1
+    m = 0
+    t = 0
+    #if count > 100000:
+	#break
+
+    if count % 100000 == 0 :
+      print  '--------- Processing Event ' + str(count) +'   -- percent complete ' + str(100*count/totevents) + '% -- '
+
+    #Here we split up event processing based on number of jobs 
+    #This is set up to have jobs range from 1 to the total number of jobs (ie dont start at job 0)
+
+    if jobs != 1:
+    	if (count - 1) % jobs == 0:
+		jobiter+=1
+	count_index = count - (jobiter-1)*jobs
+	if count_index!=num:
+		continue 
+
+    AK8LV = Makelv(AK8HL,event)
+	
+    if len(AK8LV)==0:
+	continue
+
+    tindex,bindex = Hemispherize(AK8LV,AK8LV)
+
+
+    bJetsh1 = []
+    bJetsh0  =  []
+    topJetsh1 = []
+    topJetsh0  = []
+    
+    
+
+    for i in range(0,len(bindex[1])):
+   	bJetsh1.append(AK8LV[bindex[1][i]])
+    for i in range(0,len(bindex[0])):
+    	bJetsh0.append(AK8LV[bindex[0][i]])
+    for i in range(0,len(tindex[1])):
+    	topJetsh1.append(AK8LV[tindex[1][i]])
+    for i in range(0,len(tindex[0])):
+    	topJetsh0.append(AK8LV[tindex[0][i]]) 	
+	
+    #-------------------------------#
+
+
+
+    bjh0 = 0
+    bjh1 = 0
+    #Require 1 pt>150 jet in each hemisphere (top jets already have the 150GeV requirement) 
+    for bjet in bJetsh0:
+	if bjet.Perp() > 200.0:
+		bjh0+=1
+    for bjet in bJetsh1:
+	if bjet.Perp() > 200.0:
+		bjh1+=1
+
+    njets11b0 	= 	((len(topJetsh1) == 1) and (bjh0 == 1))
+    njets11b1 	= 	((len(topJetsh0) == 1) and (bjh1 == 1))
+
+
+    c0 = 0
+    c1 = 0
+    c2 = 0
+    c3 = 0	
+    c4 = 0	
+    c5 = 0
+    c6 = 0
+    c7 = 0	
+    c8 = 0
+    c9 = 0
+
+    for hemis in ['hemis0','hemis1']:
+
+    	if hemis == 'hemis0'   :
+		if not njets11b0:
+			continue 
+		#The Ntuple entries are ordered in pt, so [0] is the highest pt entry
+		#We are calling a candidate b jet (highest pt jet in hemisphere0)  
+		
+		tindexval = tindex[1][0]
+		bindexval = bindex[0][0]
+
+		bjet = bJetsh0[0]
+		tjet = topJetsh1[0]
+
+
+    	if hemis == 'hemis1'  :
+		if not njets11b1:
+			continue 
+
+		tindexval = tindex[0][0]
+		bindexval = bindex[1][0]
+
+		bjet = bJetsh1[0]
+		tjet = topJetsh0[0]
+
+    	weight=1.0
+     	weightSFptup=1.0
+     	weightSFptdown=1.0
+
+
+	if abs(bjet.Eta())>2.40 or abs(tjet.Eta())>2.40:	#.eta to .Eta -JL
+		continue
+
+	
+
+
+	ht = tjet.Perp() + bjet.Perp()	#.pt to .Perp - JL
+	if options.tname != "none" :
+		#Trigger reweighting done here
+		TRW = Trigger_Lookup( ht , TrigPlot ) #, options.tname )  # only takes 2 args -JL
+		weight*=TRW
+		
+	if options.ptreweight == "on":
+		#ttbar pt reweighting done here
+		event.getByLabel( GenLabel, GenHandle )
+		GenParticles = GenHandle.product()
+		PTW = PTW_Lookup( GenParticles )
+		weight*=PTW
+     		weightSFptup=max(0.0,weight*(2*PTW-1))
+     		weightSFptdown=weight
+	
+	weightb = weight*weightSFb
+	weightSFptup*=weightSFb
+	weightSFptdown*=weightSFb
+	weightSFbup = weight*(weightSFb+errorSFb)
+	weightSFbdown = weight*(weightSFb-errorSFb)
+	
+
+	if c0 == 0:	
+		Mtb0.Fill((bjet+tjet).M(),weight)    #Initial histogram (bjet+tjet) == vector sum ; .Fill makes histogram
+		c0 = 1
+
+    	bpt_cut   = bpt[0]<bjet.Perp()<bpt[1]
+    	tpt_cut   = tpt[0]<tjet.Perp()<tpt[1]
+
+    	if bpt_cut and tpt_cut:
+		
+		if c1 == 0: 
+			Mtb1.Fill((bjet+tjet).M(),weight)	#changed .mass to .M - JL
+			c1 = 1
+
+		dy_cut = dy[0]<=abs(tjet.Rapidity()-bjet.Rapidity())<dy[1]
+	    
+		if dy_cut: 
+		
+			if c2 == 0:
+	        		Mtb2.Fill((bjet+tjet).M(),weight)	#changed .mass to .M - JL	
+				c2 = 1
+			
+			event.getByLabel (topMassLabel, topMassHandle)
+        		topJetMass = topMassHandle.product()
+			tmass_cut  = tmass[0]<topJetMass[tindexval]<tmass[1]	
+		
+			if tmass_cut :
+
+				if c3 == 0:
+		    			Mtb3.Fill((bjet+tjet).M(),weight)	
+	 	    			c3 = 1
+
+         	    		event.getByLabel ( nSubjetsLabel , nSubjetsHandle )
+    	 	    		nSubjets 	 = nSubjetsHandle.product()
+		    		nsubjets_cut = nsubjets[0]<=nSubjets[tindexval]<nsubjets[1]	
+
+				if nsubjets_cut:
+
+					if c4 == 0:
+						Mtb4.Fill((bjet+tjet).M(),weight)	
+						c4 = 1
+
+					event.getByLabel (minmassLabel, minmassHandle)
+         		        	topJetMinMass 	= minmassHandle.product()
+					minmass_cut	= minmass[0]<=topJetMinMass[tindexval]<minmass[1]	
+	
+					if minmass_cut:
+
+						if c5 == 0:
+							Mtb5.Fill((bjet+tjet).M(),weight)	
+							c5 = 1
+
+				    		event.getByLabel (BDiscLabel, BDiscHandle)
+    				    		bJetBDisc 	= BDiscHandle.product()
+				    		btag_cut 	= btag[0]<bJetBDisc[bindexval]<=btag[1]	
+
+						
+    						event.getByLabel (topBDiscCSV0Label, topBDiscCSV0Handle) 
+    						Topsj0BDiscCSV 		= 	topBDiscCSV0Handle.product() 
+		
+    						event.getByLabel (topBDiscCSV1Label, topBDiscCSV1Handle)
+    						Topsj1BDiscCSV 		= 	topBDiscCSV1Handle.product() 
+		
+    						event.getByLabel (topBDiscCSV2Label, topBDiscCSV2Handle)
+    						Topsj2BDiscCSV 		= 	topBDiscCSV2Handle.product() 
+		
+    						event.getByLabel (topBDiscCSV3Label, topBDiscCSV3Handle)
+    						Topsj3BDiscCSV 		= 	topBDiscCSV3Handle.product()
+
+
+						event.getByLabel (subjets0indexLabel, subjets0indexHandle)
+			    			subjets0index 		= 	subjets0indexHandle.product() 
+
+			    			event.getByLabel (subjets1indexLabel, subjets1indexHandle)
+			    			subjets1index 		= 	subjets1indexHandle.product() 
+
+			    			event.getByLabel (subjets2indexLabel, subjets2indexHandle)
+			    			subjets2index 		= 	subjets2indexHandle.product() 
+
+			    			event.getByLabel (subjets3indexLabel, subjets3indexHandle)
+			    			subjets3index 		= 	subjets3indexHandle.product()
+
+			    			event.getByLabel (subjetsCSVLabel, subjetsCSVHandle)
+			    			subjetsCSV 		= 	subjetsCSVHandle.product()  
+						
+						SJ_csvs = [subjets0index,subjets1index,subjets2index,subjets3index]
+			
+						SJ_csvvals = []
+						for icsv in range(0,int(nSubjets[tindexval])):
+							if int(SJ_csvs[icsv][tindexval])!=-1:
+								SJ_csvvals.append(subjetsCSV[int(SJ_csvs[icsv][tindexval])])
+							else:
+								SJ_csvvals.append(0.)
+						SJ_csvmax = max(SJ_csvvals)
+						sjbtag_cut = sjbtag[0]<SJ_csvmax<=sjbtag[1]
+
+						#----changed TopTau# to tau#____ -JL ----#
+	    					event.getByLabel (tau2Label, tau2Handle)
+	    					Tau2		= 	tau2Handle.product() 
+				
+	    					event.getByLabel (tau3Label, tau3Handle)
+	    					Tau3		= 	tau3Handle.product() 
+						#----end change of names of TopTau#----#					
+	
+		
+						tau32_cut =  tau32[0]<=Tau3[tindexval]/Tau2[tindexval]<tau32[1]
+	
+						if sjbtag_cut :
+
+							if c6 == 0:
+								Mtb6.Fill((bjet+tjet).M(),weight)	#.mass to .M -JL
+								c6 = 1
+
+							if tau32_cut:
+
+								if c7 == 0:
+									Mtb7.Fill((bjet+tjet).M(),weight)	#.mass to .M -JL
+									c7 = 1
+
+								bmass_cut = bmass[0]<=topJetMass[bindexval]<bmass[1]	#.mass to .M -JL
+
+								if bmass_cut:
+
+									if c8 == 0:
+										Mtb8.Fill((bjet+tjet).M(),weight)	#.mass to .M -JL
+										c8 = 1					
+										
+									eta_regions = [eta1,eta2,eta3]
+							
+									#uncomment when data comes in
+									#BTRweight = bkg_weight(bjet,BTR,eta_regions)
+									#BTRweightsigsq = bkg_weight(bjet,BTR_err,eta_regions)
+	
+									BTRweight = 1.0		#delete when data comes in
+									BTRweightsigsq = 1.0	#delete later
+	
+
+									BTRweighterrup = BTRweight+sqrt(BTRweightsigsq)
+									BTRweighterrdown = BTRweight-sqrt(BTRweightsigsq)
+
+
+									eta1_cut = eta1[0]<=abs(bjet.Eta())<eta1[1]	
+									eta2_cut = eta2[0]<=abs(bjet.Eta())<eta2[1]	
+									eta3_cut = eta3[0]<=abs(bjet.Eta())<eta3[1]	
+									
+
+									if (eta1_cut) :
+										xbin = TagPlot2de1.GetXaxis().FindBin(bjet.Perp())
+										ybin = TagPlot2de1.GetYaxis().FindBin((tjet+bjet).M()) 
+										tagrate2d = TagPlot2de1.GetBinContent(xbin,ybin)
+										QCDbkg2D.Fill((tjet+bjet).M(),tagrate2d*weight)
+										QCDbkg2D_tmass.Fill(tjet.M(),tagrate2d*weight)
+										QCDbkg2D_teta.Fill(tjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_beta.Fill(bjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_tpt.Fill(tjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_bpt.Fill(bjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_sumpt.Fill((tjet+bjet).Perp(),tagrate2d*weight)
+										QCDbkg2D_tphi.Fill(tjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_bphi.Fill(bjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),tagrate2d*weight)
+
+			
+									if (eta2_cut):
+										xbin = TagPlot2de2.GetXaxis().FindBin(bjet.Perp())
+										ybin = TagPlot2de2.GetYaxis().FindBin((tjet+bjet).M())
+										tagrate2d = TagPlot2de2.GetBinContent(xbin,ybin)
+										QCDbkg2D.Fill((tjet+bjet).M(),tagrate2d*weight)
+										QCDbkg2D_tmass.Fill(tjet.M(),tagrate2d*weight)
+										QCDbkg2D_teta.Fill(tjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_beta.Fill(bjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_tpt.Fill(tjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_bpt.Fill(bjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_sumpt.Fill((tjet+bjet).Perp(),tagrate2d*weight)
+										QCDbkg2D_tphi.Fill(tjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_bphi.Fill(bjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),tagrate2d*weight)
+
+									if (eta3_cut):
+										xbin = TagPlot2de3.GetXaxis().FindBin(bjet.Perp())
+										ybin = TagPlot2de3.GetYaxis().FindBin((tjet+bjet).M())
+										tagrate2d = TagPlot2de3.GetBinContent(xbin,ybin)
+										QCDbkg2D.Fill((tjet+bjet).M(),tagrate2d*weight)
+										QCDbkg2D_tmass.Fill(tjet.M(),tagrate2d*weight)
+										QCDbkg2D_teta.Fill(tjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_beta.Fill(bjet.Eta(),tagrate2d*weight)
+										QCDbkg2D_tpt.Fill(tjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_bpt.Fill(bjet.Perp(),tagrate2d*weight)
+										QCDbkg2D_sumpt.Fill((tjet+bjet).Perp(),tagrate2d*weight)
+										QCDbkg2D_tphi.Fill(tjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_bphi.Fill(bjet.Phi(),tagrate2d*weight)
+										QCDbkg2D_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),tagrate2d*weight)
+
+									#for ifit in range(0,len(fittitles)):
+										#tempweight = bkg_weight(bjet,fits[ifit],eta_regions)
+										#QCDbkg_ARR[ifit].Fill((tjet+bjet).M(),tempweight*weight) 
+										#QCDbkg_tmass_ARR[ifit].Fill(tjet.M(),tempweight*weight) 
+										#QCDbkg_teta_ARR[ifit].Fill(tjet.Eta(),tempweight*weight) 
+										#QCDbkg_beta_ARR[ifit].Fill(bjet.Eta(),tempweight*weight) 
+										#QCDbkg_tpt_ARR[ifit].Fill(tjet.Perp(),tempweight*weight) 
+										#QCDbkg_bpt_ARR[ifit].Fill(bjet.Perp(),tempweight*weight) 
+										#QCDbkg_sumpt_ARR[ifit].Fill((tjet+bjet).Perp(),tempweight*weight) 
+										#QCDbkg_tphi_ARR[ifit].Fill(tjet.Phi(),tempweight*weight) 
+										#QCDbkg_bphi_ARR[ifit].Fill(bjet.Phi(),tempweight*weight) 
+										#QCDbkg_dphi_ARR[ifit].Fill(abs(tjet.Phi()-bjet.Phi()),tempweight*weight) 
+	
+									#QCDbkg.Fill((tjet+bjet).M(),BTRweight*weight)
+									#QCDbkgh.Fill((tjet+bjet).M(),BTRweighterrup*weight)
+									#QCDbkgl.Fill((tjet+bjet).M(),BTRweighterrdown*weight)  
+
+									QCDbkg_tmass.Fill(tjet.M(),BTRweight*weight)
+									QCDbkgh_tmass.Fill(tjet.M(),BTRweighterrup*weight)
+									QCDbkgl_tmass.Fill(tjet.M(),BTRweighterrdown*weight) 
+
+									QCDbkg_teta.Fill(tjet.Eta(),BTRweight*weight)
+									QCDbkgh_teta.Fill(tjet.Eta(),BTRweighterrup*weight)
+									QCDbkgl_teta.Fill(tjet.Eta(),BTRweighterrdown*weight)
+
+									QCDbkg_beta.Fill(bjet.Eta(),BTRweight*weight)
+									QCDbkgh_beta.Fill(bjet.Eta(),BTRweighterrup*weight)
+									QCDbkgl_beta.Fill(bjet.Eta(),BTRweighterrdown*weight)
+
+									QCDbkg_tpt.Fill(tjet.Perp(),BTRweight*weight)
+									QCDbkgh_tpt.Fill(tjet.Perp(),BTRweighterrup*weight)
+									QCDbkgl_tpt.Fill(tjet.Perp(),BTRweighterrdown*weight)
+
+									QCDbkg_bpt.Fill(bjet.Perp(),BTRweight*weight)
+									QCDbkgh_bpt.Fill(bjet.Perp(),BTRweighterrup*weight)
+									QCDbkgl_bpt.Fill(bjet.Perp(),BTRweighterrdown*weight)
+
+									QCDbkg_sumpt.Fill((tjet+bjet).Perp(),BTRweight*weight)
+									QCDbkgh_sumpt.Fill((tjet+bjet).Perp(),BTRweighterrup*weight)
+									QCDbkgl_sumpt.Fill((tjet+bjet).Perp(),BTRweighterrdown*weight)
+
+									QCDbkg_tphi.Fill(tjet.Phi(),BTRweight*weight)
+									QCDbkgh_tphi.Fill(tjet.Phi(),BTRweighterrup*weight)
+									QCDbkgl_tphi.Fill(tjet.Phi(),BTRweighterrdown*weight)
+
+									QCDbkg_bphi.Fill(bjet.Phi(),BTRweight*weight)
+									QCDbkgh_bphi.Fill(bjet.Phi(),BTRweighterrup*weight)
+									QCDbkgl_bphi.Fill(bjet.Phi(),BTRweighterrdown*weight)
+
+									QCDbkg_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),BTRweight*weight)
+									QCDbkgh_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),BTRweighterrup*weight)
+									QCDbkgl_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),BTRweighterrdown*weight)
+
+        						        	if btag_cut:
+
+										if c9 == 0:
+											Mtb9.Fill((tjet+bjet).M(),weightb) 
+											c9 = 1
+
+										HG_tmass.Fill(tjet.M(),weightb)
+										HG_minmass.Fill(topJetMinMass[tindexval],weightb)		
+										HG_nsubjets.Fill(nSubjets[tindexval],weightb)	
+
+										HG_teta.Fill(tjet.Eta(),weightb)
+										HG_beta.Fill(bjet.Eta(),weightb)
+										HG_tpt.Fill(tjet.Perp(),weightb)
+										HG_bpt.Fill(bjet.Perp(),weightb)
+										HG_sumpt.Fill((tjet+bjet).Perp(),weightb)
+										HG_tphi.Fill(tjet.Phi(),weightb)
+										HG_bphi.Fill(bjet.Phi(),weightb)
+										HG_dphi.Fill(abs(tjet.Phi()-bjet.Phi()),weightb)
+
+										HG_drap.Fill(abs(tjet.Rapidity()-bjet.Rapidity()),weightb)
+										HG_TopBDiscsjmaxCSV.Fill(SJ_csvmax,weightb)	
+
+										HG_tau32.Fill(Tau3[tindexval]/Tau2[tindexval],weightb)	
+										HG_bmass.Fill(bjet.M(),weightb)
+
+										#----/end of changes -JL ----#
+											
+										temp_variables = {"bpt":bjet.Perp(),"bmass":bjet.M(),"btag":bJetBDisc[bindexval],"tpt":tjet.Perp(),"tmass":topJetMass[tindexval],"nsubjets":nSubjets[tindexval],"sjbtag":SJ_csvmax} #changed values of array element -JL
+		
+										for tv in tree_vars.keys():
+											tree_vars[tv][0] = temp_variables[tv]
+										Tree.Fill()
+
+
+
+#######
+		#UNCOMMENT LATER, remove False
+		if False:# options.set!="data":
+
+			event.getByLabel (puLabel, puHandle)
+    			PileUp 		= 	puHandle.product()
+               		bin1 = PilePlot.FindBin(PileUp[0]) 
+
+			if options.pileup != 'off':
+				weight *= PilePlot.GetBinContent(bin1)
+
+
+			if run_b_SF :
+				#btagging scale factor reweighting done here
+				SFB = SFB_Lookup( bjet.Perp() )	#.pt to .Perp -JL
+				weightSFb = SFB[0]
+				errorSFb = SFB[1]
+
+        	
+######
+
+		
+
+
+f.cd()    #ROOT command: change current to this
+f.Write()
+f.Close()
+
+print "number of events: " + str(count)
+
+if options.printEvents:
+    Outf1   =   open("DataEvents"+options.num+".txt", "w")
+    sys.stdout = Outf1
+    for goodEvent in goodEvents :
+        print '{0:12.0f}:{1:12.0f}:{2:12.0f}'.format(
+            goodEvent[0], goodEvent[1], goodEvent[2]
+        )

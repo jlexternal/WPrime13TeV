@@ -1,0 +1,10 @@
+150702_100341: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create crab -USER.ui_working_dir analysis_wprimeR_allhad_limits -create -cfg crabThetaGrid.cfg
+150702_101422: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c analysis_wprimeR_allhad_limits
+150702_102048: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c analysis_wprimeR_allhad_limits
+150702_102106: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+150702_102526: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+150702_104006: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+150702_104053: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create crab -USER.ui_working_dir analysis_wprimeR_allhad_limits -create -cfg crabThetaGrid.cfg
+150702_104108: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c analysis_wprimeR_allhad_limits
+150702_104116: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+150702_104940: /cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits

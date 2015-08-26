@@ -1,0 +1,38 @@
+2015-07-02 09:48:33,651 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create crab -USER.ui_working_dir analysis_wprimeR_allhad_limits -create -cfg crabThetaGrid.cfg
+
+2015-07-02 09:48:33,651 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 09:48:33 2015 CST (14:48:33 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 09:48:33,651 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 09:48:33,784 [DEBUG] 	Input whitelist: 
+2015-07-02 09:48:33,784 [DEBUG] 	Input blacklist: 
+2015-07-02 09:48:33,784 [DEBUG] 	Converted whitelist: 
+2015-07-02 09:48:33,784 [DEBUG] 	Converted blacklist: 
+2015-07-02 09:49:19,035 [DEBUG] 	ERROR: Unable to create a valid proxy with command:
+eval `scram unsetenv -sh`; voms-proxy-init -rfc -voms cms -valid 192:00
+
+
+2015-07-02 09:49:19,333 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c analysis_wprimeR_allhad_limits
+
+2015-07-02 09:49:19,334 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 09:49:19 2015 CST (14:49:19 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 09:49:19,334 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 09:49:19,399 [DEBUG] 	Input whitelist: 
+2015-07-02 09:49:19,399 [DEBUG] 	Input blacklist: 
+2015-07-02 09:49:19,400 [DEBUG] 	Converted whitelist: 
+2015-07-02 09:49:19,400 [DEBUG] 	Converted blacklist: 
+2015-07-02 09:49:22,092 [DEBUG] 	ERROR: Unable to create a valid proxy with command:
+eval `scram unsetenv -sh`; voms-proxy-init -rfc -voms cms -valid 192:00
+
+

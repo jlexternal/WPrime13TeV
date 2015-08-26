@@ -1,0 +1,168 @@
+
+
+import os
+import array
+import glob
+import math
+import ROOT
+import sys
+from ROOT import *
+from array import *
+from optparse import OptionParser
+gROOT.Macro("rootlogon.C")
+gROOT.LoadMacro("insertlogo.C+")
+parser = OptionParser()
+
+parser.add_option('-c', '--cuts', metavar='F', type='string', action='store',
+                  default	=	'default',
+                  dest		=	'cuts',
+                  help		=	'Cuts type (ie default, rate, etc)')
+(options, args) = parser.parse_args()
+
+cuts = options.cuts
+
+
+import Wprime_Functions	
+from Wprime_Functions import *
+
+#st1 = ROOT.TH1F()		
+
+leg = TLegend(0.70, 0.35, 0.84, 0.84)
+leg.SetFillColor(0)
+leg.SetBorderSize(0)
+
+ 
+
+########--------Declare values of the different variables here in an array that the loop will call upon--------########
+
+kVar = ['nsubjets', 'minmass', 'tmass', 'tau32', 'TopBDiscsjmaxCSV', 'HG_csv', 'HG_drap', 'HG_drap_highmtb', 'bmass']
+
+rebin = [1, 4, 5, 5, 5, 5, 2, 2, 5]    ##divides original amount of bins by this factor
+
+plotTitle = ['Number of subjets', 'Minimum pairwise mass (GeV)', 'Top candidate mass (GeV)', '#tau_{3}/#tau_{2}', 'Maximum subjet CSV', 'CSV', '|#Delta y| between Top and b candidates', '|#Delta y| between Top and b candidates', 'b candidate mass (GeV)']
+
+
+sigf = [
+ROOT.TFile("rootfiles/TBkinematicsweightedsignalright1300_Trigger_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p41_v1,HLT_PFHT900_v1_none_PSET_"+options.cuts+".root"),
+ROOT.TFile("rootfiles/TBkinematicsweightedsignalright2000_Trigger_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p41_v1,HLT_PFHT900_v1_none_PSET_"+options.cuts+".root"),
+ROOT.TFile("rootfiles/TBkinematicsweightedsignalright2700_Trigger_HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p41_v1,HLT_PFHT900_v1_none_PSET_"+options.cuts+".root")
+]
+
+DataB11 = ROOT.TFile("rootfiles/TBkinematicsQCD_PSET_"+options.cuts+"weighted.root")
+TTmc = ROOT.TFile("rootfiles/TBkinematicsttbar_PSET_"+options.cuts+"weighted.root")
+
+########--------Loop through the multiple variables and create histograms for each--------########
+
+
+
+for index in range(0,len(kVar)):
+
+	print "Running loop for kVar = " + kVar[index]
+
+	#Assign the signal files
+	sigh = [
+	sigf[0].Get(str(kVar[index])),
+	sigf[1].Get(str(kVar[index])),
+	sigf[2].Get(str(kVar[index]))
+	]
+
+	sigh[0].Scale(1/sigh[0].Integral())
+	sigh[1].Scale(1/sigh[1].Integral())
+	sigh[2].Scale(1/sigh[2].Integral())
+
+	sigh[0].Rebin(rebin[index])
+	sigh[1].Rebin(rebin[index])
+	sigh[2].Rebin(rebin[index])
+
+	#sigh[0].SetLineStyle(5)
+	#sigh[1].SetLineStyle(6)
+	#sigh[2].SetLineStyle(7)
+
+	#sigh[0].SetLineWidth(2)
+	#sigh[1].SetLineWidth(2)
+	#sigh[2].SetLineWidth(2)
+
+	sigh[0].SetLineColor(4)	#blue
+	sigh[1].SetLineColor(6)	#purple
+	sigh[2].SetLineColor(8)	#green
+
+
+	DataFS = DataB11.Get(str(kVar[index]))
+	TTmcFS = TTmc.Get(str(kVar[index]))
+
+	DataFS.Scale(1/DataFS.Integral())
+	TTmcFS.Scale(1/TTmcFS.Integral())
+
+	TTmcFS.Rebin(rebin[index])
+	DataFS.Rebin(rebin[index])
+
+	DataFS.SetLineColor(1)	#black
+	TTmcFS.SetLineColor(2)	#red
+	
+	c1 = TCanvas('c1', 'Plots for discriminator variables', 900, 700)  
+
+	#main = ROOT.TPad("main", "main", 0, 0.3, 1, 1)
+
+#	main.SetLeftMargin(0.16)
+#	main.SetRightMargin(0.05)
+#	main.SetTopMargin(0.11)
+#	main.SetBottomMargin(0.0)
+
+#	main.Draw()
+
+#	main.cd()
+	
+
+	output = ROOT.TFile( "TBkinematics_discrimvariables_output_PSET_"+options.cuts+".root", "recreate" )
+	output.cd()
+
+	#Draw the histograms	 (?)
+
+	if index==0:
+		leg.AddEntry( DataFS, 	'QCD', 			'L')
+		leg.AddEntry( TTmcFS, 	't#bar{t}', 		'L')
+		leg.AddEntry( sigh[0], 	'W`_{R} at 1300 GeV', 	'L')
+		leg.AddEntry( sigh[1], 	'W`_{R} at 2000 GeV', 	'L')
+		leg.AddEntry( sigh[2], 	'W`_{R} at 2700 GeV', 	'L')
+
+	#c1.cd()
+	#c1.SetLeftMargin(0.17)
+	#st1.GetXaxis().SetRangeUser(0,3000)
+
+	axisMax = max(DataFS.GetMaximum(), TTmcFS.GetMaximum(), sigh[0].GetMaximum(), sigh[1].GetMaximum(), sigh[2].GetMaximum())
+
+	st1 = DataFS
+	st1.SetStats(0)
+	st1.SetMaximum(axisMax * 1.3)         			#sets y-axis limits for the plot axes
+	st1.SetMinimum(0.0)					#sets limits for the plot axes
+	st1.SetTitle(";" + plotTitle[index] + ';Normalized Counts')	#get title from preset array above 
+	#gPad.SetLeftMargin(.16)
+	st1.GetYaxis().SetTitleOffset(1.2)
+	st1.Draw("hist")
+
+	#DataFS.Draw("samehist")
+	TTmcFS.Draw("samehist")
+	sigh[0].Draw("samehist")
+	sigh[1].Draw("samehist")
+	sigh[2].Draw("samehist")
+
+	leg.Draw()
+	prelim = TLatex()
+	prelim.SetNDC()
+
+
+	#insertlogo( main, 2, 11 )
+
+	#prelim.DrawLatex( 0.5, 0.91, "#scale[0.8]{CMS Preliminary, 8 TeV, 19.7 fb^{-1}}" )
+
+	#gPad.SetLeftMargin(.16)
+
+	#gPad.Update()	
+
+#	main.RedrawAxis()
+
+	c1.Print('plots/'+kVar[index]+'discriminatorVariables_PSET_'+options.cuts+'.root', 'root')
+	c1.Print('plots/'+kVar[index]+'discriminatorVariables_PSET_'+options.cuts+'.pdf', 'pdf')
+	c1.Print('plots/'+kVar[index]+'discriminatorVariables_PSET_'+options.cuts+'.png', 'png')
+output.Write()
+output.Close()

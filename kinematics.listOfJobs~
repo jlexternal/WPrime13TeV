@@ -1,0 +1,23 @@
+
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 1 -j 8 -c loose -g on
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 2 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 3 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 4 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 5 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 6 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 7 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s ttbar -u on -n 8 -j 8 -c loose -g on
+
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 1 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 2 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 3 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 4 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 5 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 6 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 7 -j 8 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s QCDFLAT7000 -u on -n 8 -j 8 -c loose -g on 
+
+python ./tardir/TBkinematics13TeV.py -s signalright1300 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s signalright2000 -c loose -g on 
+python ./tardir/TBkinematics13TeV.py -s signalright2700 -c loose -g on 
+

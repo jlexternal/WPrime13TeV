@@ -1,0 +1,99 @@
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband2 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband2 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband2 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband2 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband2 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s signalright1300 -c rate_sideband2 -g on
+#python ./tardir/TBrate.py -s signalright2000 -c rate_sideband2 -g on
+#python ./tardir/TBrate.py -s signalright2700 -c rate_sideband2 -g on
+
+
+
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s ttbar -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT300 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT470 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT600 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT800 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1000 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband1 -n 1 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband1 -n 2 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband1 -n 3 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband1 -n 4 -j 5 -g on
+#python ./tardir/TBrate.py -s QCDPT1400 -c rate_sideband1 -n 5 -j 5 -g on
+
+#python ./tardir/TBrate.py -s signalright1300 -c rate_sideband1 -g on
+python ./tardir/TBrate.py -s signalright2000 -c rate_sideband1 -g on
+#python ./tardir/TBrate.py -s signalright2700 -c rate_sideband1 -g on
+
+
+
+
+
+

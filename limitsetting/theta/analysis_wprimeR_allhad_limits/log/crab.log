@@ -1,0 +1,236 @@
+2015-07-02 10:40:53,538 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -create crab -USER.ui_working_dir analysis_wprimeR_allhad_limits -create -cfg crabThetaGrid.cfg
+
+2015-07-02 10:40:53,538 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 10:40:53 2015 CST (15:40:53 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 10:40:53,538 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 10:40:53,610 [DEBUG] 	Input whitelist: 
+2015-07-02 10:40:53,611 [DEBUG] 	Input blacklist: 
+2015-07-02 10:40:53,611 [DEBUG] 	Converted whitelist: 
+2015-07-02 10:40:53,611 [DEBUG] 	Converted blacklist: 
+2015-07-02 10:40:56,661 [INFO] 	Your domain name is fnal.gov: only local dataset will be considered
+2015-07-02 10:40:58,481 [DEBUG] 	/uscms/home/jlee2/.cms_sitedbcache/0_GET_people.json expired, refreshing cache
+2015-07-02 10:40:58,481 [DEBUG] 	getData: 
+	url: /sitedb/data/prod/people
+	data: {}
+2015-07-02 10:41:01,057 [DEBUG] 	Linux cmslpc36.fnal.gov 2.6.32-504.8.1.el6.x86_64 #1 SMP Tue Jan 27 13:39:10 CST 2015 x86_64 x86_64 x86_64 GNU/Linux
+ 
+Used properties:
+Linux cmslpc36.fnal.gov 2.6.32-504.8.1.el6.x86_64 #1 SMP Tue Jan 27 13:39:10 CST 2015 x86_64 x86_64 x86_64 GNU/Linux
+ 
+Used properties:
+   CMSSW.datasetpath : None
+   CMSSW.number_of_jobs : 14
+   CMSSW.output_file : results.tgz
+   CMSSW.pset : None
+   CMSSW.total_number_of_events : 100
+   CRAB.cfg : crabThetaGrid.cfg
+   CRAB.create : 
+   CRAB.jobtype : cmssw
+   CRAB.scheduler : condor
+   CRAB.use_server : 0
+   GRID.se_white_list : T1_US_FNAL,T3_US_FNALXEN
+   USER.additional_input_files : thetaGrid.py,Limits_allhadronic_right_PSET_default.root,gridpack.tgz,analysis.tgz
+   USER.return_data : 1
+   USER.script_exe : thetaGrid.sh
+   USER.ui_working_dir : analysis_wprimeR_allhad_limits
+End of used properties.
+
+2015-07-02 10:41:01,058 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/site_black_list.conf].
+2015-07-02 10:41:01,060 [DEBUG] 	Enforced black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2 
+2015-07-02 10:41:01,060 [INFO] 	PSN black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2
+2015-07-02 10:41:01,276 [DEBUG] 	CMSSW::__init__
+2015-07-02 10:41:01,283 [DEBUG] 	Scram::Scram() version is 2
+2015-07-02 10:41:01,283 [DEBUG] 	Scram::Scram() arch is slc6_amd64_gcc491
+2015-07-02 10:41:01,284 [DEBUG] 	Downloading file [https://cmssdt.cern.ch/SDT/cgi-bin] to [/uscms/home/jlee2/.cms_crab/ReleasesXML?anytype=1].
+2015-07-02 10:41:01,285 [DEBUG] 	/uscms/home/jlee2/.cms_crab/0_GET_ReleasesXML?anytype=1 expired, refreshing cache
+2015-07-02 10:41:01,285 [DEBUG] 	getData: 
+	url: /SDT/cgi-bin/ReleasesXML?anytype=1
+	data: {}
+2015-07-02 10:41:02,567 [DEBUG] 	Additional input files: ['thetaGrid.sh', 'thetaGrid.py', 'Limits_allhadronic_right_PSET_default.root', 'gridpack.tgz', 'analysis.tgz']
+2015-07-02 10:41:03,531 [DEBUG] 	Job splitting method: ForScript
+2015-07-02 10:41:03,532 [DEBUG] 	Splitting per job
+2015-07-02 10:41:03,532 [INFO] 	Required 14 jobs in total 
+2015-07-02 10:41:03,532 [INFO] 	Required 14 jobs in total 
+2015-07-02 10:41:03,532 [INFO] 	Required 100 events in total 
+2015-07-02 10:41:03,532 [DEBUG] 	N jobs  14
+2015-07-02 10:41:03,532 [INFO] 	14 jobs can be created
+2015-07-02 10:41:03,577 [DEBUG] 	lib /uscms/home/jlee2/CMSSW_7_4_1/lib to be tarred
+2015-07-02 10:41:04,604 [DEBUG] 	Creator: JobType CMSSW created
+2015-07-02 10:41:04,604 [DEBUG] 	Creator: total # of jobs = 14
+2015-07-02 10:41:04,604 [DEBUG] 	Creator constructor finished
+2015-07-02 10:41:06,913 [DEBUG] 	Creator::run() called
+2015-07-02 10:41:06,915 [DEBUG] 	Scram::Scram() version is 2
+2015-07-02 10:41:06,915 [DEBUG] 	Scram::Scram() arch is slc6_amd64_gcc491
+2015-07-02 10:41:07,036 [INFO] 	Creating 14 jobs, please wait...
+2015-07-02 10:41:07,037 [DEBUG] 	Creation Time: 0.12318611145
+2015-07-02 10:41:07,037 [INFO] 	Total of 14 jobs created.
+
+2015-07-02 10:41:09,085 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -submit -c analysis_wprimeR_allhad_limits
+
+2015-07-02 10:41:09,086 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 10:41:09 2015 CST (15:41:09 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 10:41:09,086 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 10:41:09,211 [DEBUG] 	Input whitelist: 
+2015-07-02 10:41:09,212 [DEBUG] 	Input blacklist: 
+2015-07-02 10:41:09,212 [DEBUG] 	Converted whitelist: 
+2015-07-02 10:41:09,212 [DEBUG] 	Converted blacklist: 
+2015-07-02 10:41:12,706 [INFO] 	Your domain name is fnal.gov: only local dataset will be considered
+2015-07-02 10:41:13,797 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/site_black_list.conf].
+2015-07-02 10:41:13,798 [DEBUG] 	Enforced black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2 
+2015-07-02 10:41:13,798 [INFO] 	PSN black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2
+2015-07-02 10:41:13,806 [DEBUG] 	parseRange_ None
+2015-07-02 10:41:13,820 [DEBUG] 	Scram::Scram() version is 2
+2015-07-02 10:41:13,820 [DEBUG] 	Scram::Scram() arch is slc6_amd64_gcc491
+2015-07-02 10:41:13,827 [DEBUG] 	Submitter::run() called
+2015-07-02 10:41:13,835 [DEBUG] 	nsjobs -1
+2015-07-02 10:41:13,835 [DEBUG] 	Total jobs 14
+2015-07-02 10:41:13,842 [DEBUG] 	nj_list [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+2015-07-02 10:41:13,884 [DEBUG] 	GRIDNAME: /CN=seok junlee 
+2015-07-02 10:41:14,180 [DEBUG] 	Submission DashBoard Pre-Submission report: {'ApplicationVersion': 'CMSSW_7_4_1', 'taskId': 'jun_analysis_wprimeR_allhad_limits_so9e20', 'resubmitter': 'user', 'tool': 'crab2', 'vo': 'cms', 'tool_ui': 'cmslpc36.fnal.gov', 'JSToolVersion': '2.11.1_patch1', 'user': 'jun', 'scheduler': 'condor', 'taskType': 'analysis', 'CMSUser': 'jun', 'jobId': 'TaskMeta', 'datasetFull': None, 'exe': 'cmsRun', 'GridName': '/CN=seok junlee', 'SubmissionType': 'direct'}
+2015-07-02 10:41:14,181 [INFO] 	Checking available resources...
+2015-07-02 10:41:14,193 [INFO] 	Found  compatible site(s) for job 1
+2015-07-02 10:41:14,193 [INFO] 	1 blocks of jobs will be submitted
+2015-07-02 10:41:14,193 [DEBUG] 	Delegating proxy 
+2015-07-02 10:41:14,194 [DEBUG] 	Submitting jobs [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+2015-07-02 10:41:14,235 [INFO] 	SB requirements = 
+transfer_input_files = /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/share/default.tgz,/uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/share/arguments.xml,/uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/job/CMSSW.sh
+
+2015-07-02 10:41:14,237 [INFO] 	no submissionDay in input JDL, use today= 150702
+2015-07-02 10:41:14,515 [DEBUG] 	Result of cd /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/share/.condor_temp; condor_submit /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/share/.condor_temp/jun_analysis_wprimeR_allhad_limits_so9e20_job14.jdl
+0
+Submitting job(s)..............
+14 job(s) submitted to cluster 65690.
+2015-07-02 10:41:14,516 [DEBUG] 	Returning {u'jun_analysis_wprimeR_allhad_limits_so9e20_job14': 'cmslpc36.fnal.gov//150702//65690.13', u'jun_analysis_wprimeR_allhad_limits_so9e20_job12': 'cmslpc36.fnal.gov//150702//65690.11', u'jun_analysis_wprimeR_allhad_limits_so9e20_job13': 'cmslpc36.fnal.gov//150702//65690.12', u'jun_analysis_wprimeR_allhad_limits_so9e20_job10': 'cmslpc36.fnal.gov//150702//65690.9', u'jun_analysis_wprimeR_allhad_limits_so9e20_job11': 'cmslpc36.fnal.gov//150702//65690.10', u'jun_analysis_wprimeR_allhad_limits_so9e20_job8': 'cmslpc36.fnal.gov//150702//65690.7', u'jun_analysis_wprimeR_allhad_limits_so9e20_job9': 'cmslpc36.fnal.gov//150702//65690.8', u'jun_analysis_wprimeR_allhad_limits_so9e20_job4': 'cmslpc36.fnal.gov//150702//65690.3', u'jun_analysis_wprimeR_allhad_limits_so9e20_job5': 'cmslpc36.fnal.gov//150702//65690.4', u'jun_analysis_wprimeR_allhad_limits_so9e20_job6': 'cmslpc36.fnal.gov//150702//65690.5', u'jun_analysis_wprimeR_allhad_limits_so9e20_job7': 'cmslpc36.fnal.gov//150702//65690.6', u'jun_analysis_wprimeR_allhad_limits_so9e20_job1': 'cmslpc36.fnal.gov//150702//65690.0', u'jun_analysis_wprimeR_allhad_limits_so9e20_job2': 'cmslpc36.fnal.gov//150702//65690.1', u'jun_analysis_wprimeR_allhad_limits_so9e20_job3': 'cmslpc36.fnal.gov//150702//65690.2'}
+jun_analysis_wprimeR_allhad_limits_so9e20
+cmslpc36.fnal.gov
+2015-07-02 10:41:14,525 [DEBUG] 	WMS : cmslpc36.fnal.gov
+Collection ID : jun_analysis_wprimeR_allhad_limits_so9e20
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 1
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 2
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 3
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 4
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 5
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 6
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 7
+2015-07-02 10:41:14,533 [DEBUG] 	Submitted job # 8
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 9
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 10
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 11
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 12
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 13
+2015-07-02 10:41:14,534 [DEBUG] 	Submitted job # 14
+2015-07-02 10:41:14,549 [DEBUG] 	Updating [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]] state SubSuccess
+2015-07-02 10:41:14,578 [DEBUG] 	GRIDNAME: /CN=seok junlee 
+2015-07-02 10:41:14,961 [DEBUG] 	Submission Time: 1.13392400742
+2015-07-02 10:41:14,962 [INFO] 	Total of 14 jobs submitted.
+2015-07-02 10:41:16,256 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+
+2015-07-02 10:41:16,257 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 10:41:16 2015 CST (15:41:16 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 10:41:16,257 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 10:41:16,323 [DEBUG] 	Input whitelist: 
+2015-07-02 10:41:16,323 [DEBUG] 	Input blacklist: 
+2015-07-02 10:41:16,323 [DEBUG] 	Converted whitelist: 
+2015-07-02 10:41:16,323 [DEBUG] 	Converted blacklist: 
+2015-07-02 10:41:19,590 [INFO] 	Your domain name is fnal.gov: only local dataset will be considered
+2015-07-02 10:41:20,851 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/site_black_list.conf].
+2015-07-02 10:41:20,852 [DEBUG] 	Enforced black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2 
+2015-07-02 10:41:20,852 [INFO] 	PSN black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2
+2015-07-02 10:41:20,859 [DEBUG] 	Status::run() called
+2015-07-02 10:41:20,859 [INFO] 	Checking the status of all jobs: please wait
+2015-07-02 10:41:21,053 [INFO] 	
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+2     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+3     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+4     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+5     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+6     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+7     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+8     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+9     N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+10    N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+--------------------------------------------------------------------------------
+11    N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+12    N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+13    N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+14    N   Submitted         SubSuccess                           cmslpc36.fnal.gov
+
+2015-07-02 10:41:21,120 [INFO] 	 14 Total Jobs 
+ >>>>>>>>> 14 Jobs Submitted 
+	List of jobs Submitted: 1-14 
+
+2015-07-02 10:41:21,130 [INFO] 	You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=jun_analysis_wprimeR_allhad_limits_so9e20
+	Your task name is: jun_analysis_wprimeR_allhad_limits_so9e20 
+
+2015-07-02 10:41:21,130 [DEBUG] 	Status Time: 0.270977020264
+2015-07-02 10:49:40,334 [DEBUG] 	/cvmfs/cms.cern.ch/crab/CRAB_2_11_1_patch1/python/crab.py -status -c analysis_wprimeR_allhad_limits
+
+2015-07-02 10:49:40,334 [INFO] 	Version 2.11.1_patch1 running on Thu Jul  2 10:49:40 2015 CST (15:49:40 UTC)
+
+crab. Working options:
+	scheduler           condor
+	job type            CMSSW
+	server              OFF
+	working directory   /uscms_data/d3/jlee2/WPrime13TeV/CMSSW_7_4_1/src/Wprime13TeV/limitsetting/theta/analysis_wprimeR_allhad_limits/
+
+2015-07-02 10:49:40,334 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/allowed_releases.conf].
+2015-07-02 10:49:40,465 [DEBUG] 	Input whitelist: 
+2015-07-02 10:49:40,465 [DEBUG] 	Input blacklist: 
+2015-07-02 10:49:40,466 [DEBUG] 	Converted whitelist: 
+2015-07-02 10:49:40,466 [DEBUG] 	Converted blacklist: 
+2015-07-02 10:49:43,971 [INFO] 	Your domain name is fnal.gov: only local dataset will be considered
+2015-07-02 10:49:45,809 [DEBUG] 	Downloading file [http://cmsdoc.cern.ch/cms/LCG/crab/config/] to [/uscms/home/jlee2/.cms_crab/site_black_list.conf].
+2015-07-02 10:49:45,810 [DEBUG] 	Enforced black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2 
+2015-07-02 10:49:45,810 [INFO] 	PSN black list: TAPE,srm-cms.cern.ch,cmssrm.fnal.gov,T1_RU,T1_TW,cmseos.fnal.gov,cmsdca2.fnal.gov,T2_PK_NCP,T3_US_Vanderbilt_EC2
+2015-07-02 10:49:45,814 [DEBUG] 	Status::run() called
+2015-07-02 10:49:45,814 [INFO] 	Checking the status of all jobs: please wait
+2015-07-02 10:49:45,972 [INFO] 	
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated                           cmslpc36.fnal.gov
+2     N   Done              Terminated                           cmslpc36.fnal.gov
+3     N   Done              Terminated                           cmslpc36.fnal.gov
+4     N   Done              Terminated                           cmslpc36.fnal.gov
+5     N   Done              Terminated                           cmslpc36.fnal.gov
+6     N   Done              Terminated                           cmslpc36.fnal.gov
+7     N   Done              Terminated                           cmslpc36.fnal.gov
+8     N   Done              Terminated                           cmslpc36.fnal.gov
+9     N   Done              Terminated                           cmslpc36.fnal.gov
+10    N   Done              Terminated                           cmslpc36.fnal.gov
+--------------------------------------------------------------------------------
+11    N   Done              Terminated                           cmslpc36.fnal.gov
+12    N   Done              Terminated                           cmslpc36.fnal.gov
+13    N   Done              Terminated                           cmslpc36.fnal.gov
+14    N   Done              Terminated                           cmslpc36.fnal.gov
+
+2015-07-02 10:49:46,020 [INFO] 	 14 Total Jobs 
+ >>>>>>>>> 14 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-14 
+
+2015-07-02 10:49:46,027 [INFO] 	You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=jun_analysis_wprimeR_allhad_limits_so9e20
+	Your task name is: jun_analysis_wprimeR_allhad_limits_so9e20 
+
+2015-07-02 10:49:46,027 [DEBUG] 	Status Time: 0.213091850281

@@ -1,0 +1,39 @@
+DEBUG 2015-07-02 09:40:40,204: 	 Executing command: 'status'
+DEBUG 2015-07-02 09:40:40,205: 	 Found CRAB cache file /uscms/home/jlee2/.crab3
+DEBUG 2015-07-02 09:40:40,434: 	 Checking credentials
+DEBUG 2015-07-02 09:40:40,434: 	 Proxy file /tmp/x509up_u50448 not found
+DEBUG 2015-07-02 09:40:40,434: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2015-07-02 09:40:43,341: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 3
+DEBUG 2015-07-02 09:40:43,443: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50448 -timeleft
+ output : 
+ error: 
+Couldn't find a valid proxy.
+
+
+ retcode : 1
+ERROR 2015-07-02 09:40:43,443: 	 Error while checking proxy timeleft for /tmp/x509up_u50448
+DEBUG 2015-07-02 09:40:43,545: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u50448 voms-proxy-info -fqan
+ output : 
+ error: 
+Couldn't find a valid proxy.
+
+
+ retcode : 1
+ERROR 2015-07-02 09:40:43,545: 	 Problems creating proxy.
+ERROR 2015-07-02 09:40:43,545: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc481/cms/crabclient/3.3.1506-comp2/bin/crab", line 136, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc481/cms/crabclient/3.3.1506-comp2/bin/crab", line 122, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc481/cms/crabclient/3.3.1506-comp2/lib/python2.6/site-packages/CRABClient/Commands/SubCommand.py", line 288, in __init__
+    self.proxyCreated = self.proxy.createNewVomsProxySimple(timeLeftThreshold = 720)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc481/cms/crabclient/3.3.1506-comp2/lib/python2.6/site-packages/CRABClient/CredentialInteractions.py", line 152, in createNewVomsProxySimple
+    raise ProxyCreationException("Problems creating proxy.")
+ProxyCreationException: Problems creating proxy.

@@ -1,0 +1,12 @@
+K 10
+svn:ignore
+V 4
+doc
+
+K 13
+svn:mergeinfo
+V 87
+/branches/2013-01:303-324
+/branches/jochen:63-77,266-275,360-362
+/tags/april-2010:76-81
+END
